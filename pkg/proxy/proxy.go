@@ -7,9 +7,10 @@ type Proxy struct {
 	AppServers []App
 }
 
-// App represents the configuration data for that mcProxy will be
+// App represents the configuration data for mcProxy will be
 // redirecting traffic to.
 type App struct {
+	Host     string
 	Port     string
 	Endpoint string
 }
