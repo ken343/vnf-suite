@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -24,8 +25,26 @@ func main() {
 	// myProxyMux.HandleFunc("/english")
 	// myProxyMux.HandleFunc("/spanish")
 	myProxyMux.HandleFunc("/russian", func(rw http.ResponseWriter, req *http.Request) {
-		mcReq := req
-		fmt.Printf("The port is ->%s\n", mcReq.URL.Port())
+
+		targetQuery := "?" + req.URL.RawQuery
+		targetURL := "http://" + "localhost" + ":8083" + targetQuery
+		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
+		mcReq, err := http.NewRequest(req.Method, targetURL, req.Body)
+		if err != nil {
+			log.Fatalf("Endpoint /russian new request not generated: %v\n", err)
+		}
+		defer req.Body.Close()
+
+		resp, err := mcClient.Do(mcReq)
+		if err != nil {
+			log.Fatalf("Endpoint /russian new response not generated from application server: %v\n", err)
+		}
+		defer resp.Body.Close()
+
+		fmt.Fprintf(rw, "This is the final return %v", resp.Body)
+
+		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
+
 	})
 
 	// myProxyServer will utilize the port indicated by the proxy profile.
