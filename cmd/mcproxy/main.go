@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -14,6 +12,9 @@ const (
 )
 
 // Variable need to create a client where the reverse proxy can forward requests.
+// This variable is declared globally because documentation says that http.Client
+// is safe for concurrent use and uses caching. Thus all routes will use a single
+// mcClient.
 var (
 	mcClient = &http.Client{}
 )
@@ -23,152 +24,17 @@ func main() {
 
 	myProxyMux := http.NewServeMux()
 
-	myProxyMux.HandleFunc("/", func(rw http.ResponseWriter, req *http.Request) {
+	defaultRoute := NewRoute("localhost", "8081", "/", mcClient)
+	myProxyMux.Handle("/", defaultRoute)
 
-		targetQuery := "?" + req.URL.RawQuery
-		targetURL := "http://" + "localhost" + ":8081" + targetQuery
-		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
-		mcReq, err := http.NewRequest(req.Method, targetURL, nil)
-		if err != nil {
-			log.Fatalf("Endpoint /english new request not generated: %v\n", err)
-		}
-		defer req.Body.Close()
+	englishRoute := NewRoute("localhost", "8081", "/english", mcClient)
+	myProxyMux.Handle("/english", englishRoute)
 
-		resp, err := mcClient.Do(mcReq) //GET
-		if err != nil {
-			log.Fatalf("Endpoint /english new response not generated from application server: %v\n", err)
-		}
-		defer resp.Body.Close()
+	spanishRoute := NewRoute("localhost", "8082", "/spanish", mcClient)
+	myProxyMux.Handle("/spanish", spanishRoute)
 
-		buffer := make([]byte, 64)
-		for {
-			n, err := resp.Body.Read(buffer)
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				log.Fatalf("Reading Error: %v", err)
-			}
-			fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
-
-			fmt.Fprintf(rw, string(buffer))
-		}
-
-		fmt.Fprint(rw, "\n")
-		fmt.Printf("Response Body is : %s\n", buffer)
-
-		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
-	})
-
-	myProxyMux.HandleFunc("/english", func(rw http.ResponseWriter, req *http.Request) {
-
-		targetQuery := "?" + req.URL.RawQuery
-		targetURL := "http://" + "localhost" + ":8081" + targetQuery
-		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
-		mcReq, err := http.NewRequest(req.Method, targetURL, nil)
-		if err != nil {
-			log.Fatalf("Endpoint /english new request not generated: %v\n", err)
-		}
-		defer req.Body.Close()
-
-		resp, err := mcClient.Do(mcReq) //GET
-		if err != nil {
-			log.Fatalf("Endpoint /english new response not generated from application server: %v\n", err)
-		}
-		defer resp.Body.Close()
-
-		buffer := make([]byte, 64)
-		for {
-			n, err := resp.Body.Read(buffer)
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				log.Fatalf("Reading Error: %v", err)
-			}
-			fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
-
-			fmt.Fprintf(rw, string(buffer))
-		}
-
-		fmt.Fprint(rw, "\n")
-		fmt.Printf("Response Body is : %s\n", buffer)
-
-		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
-
-	})
-
-	myProxyMux.HandleFunc("/spanish", func(rw http.ResponseWriter, req *http.Request) {
-
-		targetQuery := "?" + req.URL.RawQuery
-		targetURL := "http://" + "localhost" + ":8082" + targetQuery
-		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
-		mcReq, err := http.NewRequest(req.Method, targetURL, nil)
-		if err != nil {
-			log.Fatalf("Endpoint /spanish new request not generated: %v\n", err)
-		}
-		defer req.Body.Close()
-
-		resp, err := mcClient.Do(mcReq) //GET
-		if err != nil {
-			log.Fatalf("Endpoint /spanish new response not generated from application server: %v\n", err)
-		}
-		defer resp.Body.Close()
-
-		buffer := make([]byte, 64)
-		for {
-			n, err := resp.Body.Read(buffer)
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				log.Fatalf("Reading Error: %v", err)
-			}
-			fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
-
-			fmt.Fprintf(rw, string(buffer))
-		}
-
-		fmt.Fprint(rw, "\n")
-		fmt.Printf("Response Body is : %s\n", buffer)
-
-		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
-
-	})
-
-	myProxyMux.HandleFunc("/russian", func(rw http.ResponseWriter, req *http.Request) {
-
-		targetQuery := "?" + req.URL.RawQuery
-		targetURL := "http://" + "localhost" + ":8083" + targetQuery
-		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
-		mcReq, err := http.NewRequest(req.Method, targetURL, nil)
-		if err != nil {
-			log.Fatalf("Endpoint /russian new request not generated: %v\n", err)
-		}
-		defer req.Body.Close()
-
-		resp, err := mcClient.Do(mcReq) //GET
-		if err != nil {
-			log.Fatalf("Endpoint /russian new response not generated from application server: %v\n", err)
-		}
-		defer resp.Body.Close()
-
-		buffer := make([]byte, 64)
-		for {
-			n, err := resp.Body.Read(buffer)
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				log.Fatalf("Reading Error: %v", err)
-			}
-			fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
-
-			fmt.Fprintf(rw, string(buffer))
-		}
-
-		fmt.Fprint(rw, "\n")
-		fmt.Printf("Response Body is : %s\n", buffer)
-
-		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
-
-	})
+	russianRoute := NewRoute("localhost", "8083", "/russian", mcClient)
+	myProxyMux.Handle("/russian", russianRoute)
 
 	// myProxyServer will utilize the port indicated by the proxy profile.
 	myProxyServer := &http.Server{
