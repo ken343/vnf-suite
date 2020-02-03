@@ -42,7 +42,8 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	// Create URL that targets the appropriate application server.
 	targetQuery := "?" + req.URL.RawQuery
-	targetURL := "http://" + r.appHost + ":" + r.appPort + targetQuery
+	fmt.Printf("r.endpoint == %s\n", r.endpoint)
+	targetURL := "http://" + r.appHost + r.appPort + r.endpoint + targetQuery
 	fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
 
 	// Generate a new request that will be sent to the target application

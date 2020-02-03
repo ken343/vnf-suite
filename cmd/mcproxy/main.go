@@ -26,17 +26,10 @@ func main() {
 
 	myProxyMux := http.NewServeMux()
 
-	defaultApp := proxy.NewApp("localhost", "8081", "/", mcClient)
-	myProxyMux.Handle("/", defaultApp)
-
-	englishApp := proxy.NewApp("localhost", "8081", "/english", mcClient)
-	myProxyMux.Handle("/english", englishApp)
-
-	spanishApp := proxy.NewApp("localhost", "8082", "/spanish", mcClient)
-	myProxyMux.Handle("/spanish", spanishApp)
-
-	russianApp := proxy.NewApp("localhost", "8083", "/russian", mcClient)
-	myProxyMux.Handle("/russian", russianApp)
+	RouteApp("/", "localhost", "8081", mcClient, myProxyMux)
+	RouteApp("/english", "localhost", "8081", mcClient, myProxyMux)
+	RouteApp("/spanish", "localhost", "8082", mcClient, myProxyMux)
+	RouteApp("/russian", "localhost", "8083", mcClient, myProxyMux)
 
 	// myProxyServer will utilize the port indicated by the proxy profile.
 	myProxyServer := &http.Server{
@@ -48,4 +41,12 @@ func main() {
 
 	myProxyServer.ListenAndServe()
 
+}
+
+// RouteApp takes the input data of the application server
+// and hooks it up to the proxy multiplexer. The RouteApp function
+// also requires an http.Client to make requests from.
+func RouteApp(endpoint string, ip string, port string, client *http.Client, mux *http.ServeMux) {
+	newApp := proxy.NewApp(ip, ":"+port, endpoint, client)
+	mux.Handle(endpoint, newApp)
 }
