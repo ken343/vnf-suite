@@ -57,11 +57,12 @@ func (r Route) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Read contents of response body into the new response writer
 	// that will be sent to the original client.
 	buffer := make([]byte, 64)
+	rw.Write([]byte("\n"))
 	for {
 		n, err := resp.Body.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Fprintf(rw, string(bytes.Trim(buffer, "/x00")))
+				rw.Write(bytes.Trim(buffer, "\x00"))
 
 				fmt.Printf("Read %d bytes into buffer == %v\n", n, buffer[:n])
 				break
@@ -70,16 +71,16 @@ func (r Route) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			log.Fatalf(err.Error())
 
 		}
-		fmt.Printf("Read %d bytes - buffer == %v\n", n, buffer[:n])
+		fmt.Printf("Read %d bytes -> buffer == %v\n", n, buffer[:n])
 
-		fmt.Fprintf(rw, string(bytes.Trim(buffer, "/x00")))
+		rw.Write(bytes.Trim(buffer, "\x00"))
 	}
 
 	// Add a newline for readability and print some sanity checks.
 	// Sanity checks may be removed at a later date.
-	fmt.Fprint(rw, "\n")
+	rw.Write([]byte("\n"))
 	fmt.Printf("Response Body is : %s\n", buffer)
 
-	fmt.Printf("The port is ->%s\n", req.RemoteAddr)
+	fmt.Printf("The sending port is == %s\n", req.RemoteAddr)
 
 }
