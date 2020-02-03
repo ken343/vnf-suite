@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -29,19 +30,33 @@ func main() {
 		targetQuery := "?" + req.URL.RawQuery
 		targetURL := "http://" + "localhost" + ":8083" + targetQuery
 		fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
-		mcReq, err := http.NewRequest(req.Method, targetURL, req.Body)
+		mcReq, err := http.NewRequest(req.Method, targetURL, nil)
 		if err != nil {
 			log.Fatalf("Endpoint /russian new request not generated: %v\n", err)
 		}
-		defer req.Body.Close()
+		// defer req.Body.Close()
 
-		resp, err := mcClient.Do(mcReq)
+		resp, err := mcClient.Do(mcReq) //GET
 		if err != nil {
 			log.Fatalf("Endpoint /russian new response not generated from application server: %v\n", err)
 		}
-		defer resp.Body.Close()
+		// defer resp.Body.Close()
 
-		fmt.Fprintf(rw, "This is the final return %v", resp.Body)
+		buffer := make([]byte, 2)
+		for {
+			n, err := resp.Body.Read(buffer)
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				log.Fatalf("Reading Error: %v", err)
+			}
+			fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
+
+			fmt.Fprintf(rw, string(buffer))
+		}
+
+		fmt.Fprint(rw, "\n")
+		fmt.Printf("Response Body is : %s\n", buffer)
 
 		fmt.Printf("The port is ->%s\n", req.RemoteAddr)
 
