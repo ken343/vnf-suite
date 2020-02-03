@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/ken343/vnf-suite/pkg/proxy"
 )
 
 // Need to figure out what constants I need.
@@ -20,21 +22,21 @@ var (
 )
 
 func main() {
-	fmt.Printf("Howdy, mcProxy is listening on port %s\n...", RPORT)
+	fmt.Printf("Howdy, mcProxy is listening on port %s...\n", RPORT)
 
 	myProxyMux := http.NewServeMux()
 
-	defaultRoute := NewRoute("localhost", "8081", "/", mcClient)
-	myProxyMux.Handle("/", defaultRoute)
+	defaultApp := proxy.NewApp("localhost", "8081", "/", mcClient)
+	myProxyMux.Handle("/", defaultApp)
 
-	englishRoute := NewRoute("localhost", "8081", "/english", mcClient)
-	myProxyMux.Handle("/english", englishRoute)
+	englishApp := proxy.NewApp("localhost", "8081", "/english", mcClient)
+	myProxyMux.Handle("/english", englishApp)
 
-	spanishRoute := NewRoute("localhost", "8082", "/spanish", mcClient)
-	myProxyMux.Handle("/spanish", spanishRoute)
+	spanishApp := proxy.NewApp("localhost", "8082", "/spanish", mcClient)
+	myProxyMux.Handle("/spanish", spanishApp)
 
-	russianRoute := NewRoute("localhost", "8083", "/russian", mcClient)
-	myProxyMux.Handle("/russian", russianRoute)
+	russianApp := proxy.NewApp("localhost", "8083", "/russian", mcClient)
+	myProxyMux.Handle("/russian", russianApp)
 
 	// myProxyServer will utilize the port indicated by the proxy profile.
 	myProxyServer := &http.Server{
