@@ -11,6 +11,7 @@ import (
 // Profile will hold the port of the current reverse proxy server
 // as well as load in new array of application servers.
 type Profile struct {
+	Name       string
 	Port       string
 	AppServers []App
 }
@@ -19,19 +20,19 @@ type Profile struct {
 // that will dynamically add several application server routes
 // based on a profile. My swap this with proxy type in /pkg/proxy/
 type App struct {
-	appHost     string
-	appPort     string
-	endpoint    string
-	routeClient *http.Client
+	AppHost     string
+	AppPort     string
+	Endpoint    string
+	RouteClient *http.Client
 }
 
 // NewApp constructs a new App type.
-func NewApp(host string, port string, endpoint string, client *http.Client) App {
+func NewApp(host string, port string, Endpoint string, client *http.Client) App {
 	newApp := App{
-		appHost:     host,
-		appPort:     port,
-		endpoint:    endpoint,
-		routeClient: client,
+		AppHost:     host,
+		AppPort:     port,
+		Endpoint:    Endpoint,
+		RouteClient: client,
 	}
 
 	return newApp
@@ -42,22 +43,25 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	// Create URL that targets the appropriate application server.
 	targetQuery := "?" + req.URL.RawQuery
-	fmt.Printf("r.endpoint == %s\n", r.endpoint)
-	targetURL := "http://" + r.appHost + r.appPort + r.endpoint + targetQuery
-	fmt.Printf("Sanity Check targetURL == %s\n", targetURL)
+	targetURL := "http://" + r.AppHost + ":" + r.AppPort + r.Endpoint + targetQuery
+
+	fmt.Printf("Routing to IP == %s\n", r.AppHost)
+	fmt.Printf("Routing to Port == %s\n", r.AppPort)
+	fmt.Printf("Endpoint mcProxy received == %s\n", r.Endpoint)
+	fmt.Printf("Sanity Check targetURL == %s\n\n", "http://"+r.AppHost+":"+r.AppPort+targetQuery)
 
 	// Generate a new request that will be sent to the target application
 	// server.
 	mcReq, err := http.NewRequest(req.Method, targetURL, req.Body)
 	if err != nil {
-		log.Fatalf("Endpoint /%s new request not generated: %v\n", r.endpoint, err)
+		log.Fatalf("Endpoint /%s new request not generated: %v\n", r.Endpoint, err)
 	}
 	defer req.Body.Close()
 
 	// Send request to target application server.
-	resp, err := r.routeClient.Do(mcReq) //GET
+	resp, err := r.RouteClient.Do(mcReq) //GET
 	if err != nil {
-		log.Fatalf("Endpoint /%s new response not generated from application server: %v\n", r.endpoint, err)
+		log.Fatalf("Endpoint /%s new response not generated from application server: %v\n", r.Endpoint, err)
 	}
 	defer resp.Body.Close()
 
@@ -89,6 +93,6 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte("\n"))
 	fmt.Printf("Response Body is : %s\n", buffer)
 
-	fmt.Printf("The sending port is == %s\n", req.RemoteAddr)
+	fmt.Printf("The origin host:port is == %s\n", req.RemoteAddr)
 
 }
