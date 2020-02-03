@@ -52,17 +52,24 @@ func (r Route) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 	defer resp.Body.Close()
 
+	rw.Header().Set("Content-Type", "text/plain")
 	// Read contents of response body into the new response writer
 	// that will be sent to the original client.
 	buffer := make([]byte, 64)
 	for {
 		n, err := resp.Body.Read(buffer)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			log.Fatalf("Reading Error: %v", err)
+		if err != nil {
+			if err == io.EOF {
+				fmt.Fprintf(rw, string(buffer))
+
+				fmt.Printf("Read %d bytes - buffer == %v\n", n, buffer[:n])
+				break
+			}
+
+			log.Fatalf(err.Error())
+
 		}
-		fmt.Printf("Read %d bytes - buffer == %v", n, buffer[:n])
+		fmt.Printf("Read %d bytes - buffer == %v\n", n, buffer[:n])
 
 		fmt.Fprintf(rw, string(buffer))
 	}
