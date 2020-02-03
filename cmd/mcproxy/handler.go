@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -60,9 +61,9 @@ func (r Route) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		n, err := resp.Body.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Fprintf(rw, string(buffer))
+				fmt.Fprintf(rw, string(bytes.Trim(buffer, "/x00")))
 
-				fmt.Printf("Read %d bytes - buffer == %v\n", n, buffer[:n])
+				fmt.Printf("Read %d bytes into buffer == %v\n", n, buffer[:n])
 				break
 			}
 
@@ -71,7 +72,7 @@ func (r Route) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Printf("Read %d bytes - buffer == %v\n", n, buffer[:n])
 
-		fmt.Fprintf(rw, string(buffer))
+		fmt.Fprintf(rw, string(bytes.Trim(buffer, "/x00")))
 	}
 
 	// Add a newline for readability and print some sanity checks.

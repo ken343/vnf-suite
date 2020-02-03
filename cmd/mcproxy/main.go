@@ -20,7 +20,7 @@ var (
 )
 
 func main() {
-	fmt.Println("Howdy?")
+	fmt.Printf("Howdy, mcProxy is listening on port %s\n", RPORT)
 
 	myProxyMux := http.NewServeMux()
 
