@@ -34,8 +34,10 @@ var (
 )
 
 func main() {
+	// Set up error log to ouptut information
+	log.SetFlags(log.Lshortfile)
 
-	log.SetFlags(log.Llongfile)
+	CreateProfile()
 
 	// Test store and load functions.
 	storeProfile(testProfile)
