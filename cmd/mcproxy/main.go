@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ken343/vnf-suite/pkg/proxy"
@@ -18,9 +21,9 @@ const (
 // is safe for concurrent use and uses caching. Thus all routes will use a single
 // mcClient.
 var (
-	mcClient   = &http.Client{}
-	myProxyMux = http.NewServeMux()
-	mcProfile  = &proxy.Profile{
+	mcClient    = &http.Client{}
+	myProxyMux  = http.NewServeMux()
+	testProfile = &proxy.Profile{
 		Name: "ken",
 		Port: "7777",
 		AppServers: []proxy.App{
@@ -33,8 +36,19 @@ var (
 )
 
 func main() {
-	fmt.Printf("Howdy, mcProxy is listening on port %s...\n", RPORT)
 
+	log.SetFlags(log.Llongfile)
+
+	// Test store and load functions.
+	fmt.Printf("testProfile Check --> %v\n", testProfile)
+	storeProfile(testProfile)
+
+	mcProfile := loadProfile("ken")
+	fmt.Printf("mcProfile Check --> %v\n", mcProfile)
+
+	fmt.Printf("Howdy, mcProxy is listening on port %s...\n", ":"+mcProfile.Port)
+	// Remember that proxy.Profile.Appservers[i] implement the "Handler" interface.
+	// Hence they are being attachec to the multiplexor.
 	myProxyMux.Handle(mcProfile.AppServers[0].Endpoint, mcProfile.AppServers[0])
 	myProxyMux.Handle(mcProfile.AppServers[1].Endpoint, mcProfile.AppServers[1])
 	myProxyMux.Handle(mcProfile.AppServers[2].Endpoint, mcProfile.AppServers[2])
@@ -42,7 +56,7 @@ func main() {
 
 	// myProxyServer will utilize the port indicated by the proxy profile.
 	myProxyServer := &http.Server{
-		Addr:         RPORT,
+		Addr:         ":" + mcProfile.Port,
 		Handler:      myProxyMux,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -52,10 +66,32 @@ func main() {
 
 }
 
-// RouteApp takes the input data of the application server
-// and hooks it up to the proxy multiplexer. The RouteApp function
-// also requires an http.Client to make requests from.
-func RouteApp(endpoint string, ip string, port string, client *http.Client, mux *http.ServeMux) {
-	newApp := proxy.NewApp(ip, ":"+port, endpoint, client)
-	mux.Handle(endpoint, newApp)
+func loadProfile(profileName string) *proxy.Profile {
+	file := profileName + ".json"
+	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		log.Fatalf("Error Opening File: %v\n", err)
+	}
+	defer f.Close()
+
+	newProfile := &proxy.Profile{}
+	jsonerr := json.NewDecoder(f).Decode(newProfile)
+	if jsonerr != nil {
+		log.Fatalf("Error Decoding File: %v\n", err)
+	}
+	return newProfile
+}
+
+func storeProfile(profile *proxy.Profile) {
+	file := "./config/" + profile.Name + ".json"
+	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		log.Fatalf("Error opening file to be written: %v\n", err)
+	}
+	defer f.Close()
+
+	jsonerr := json.NewEncoder(f).Encode(profile)
+	if jsonerr != nil {
+		log.Fatalf("Error encoding file %v.\n", jsonerr)
+	}
 }

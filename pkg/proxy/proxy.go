@@ -96,3 +96,10 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Printf("The origin host:port is == %s\n", req.RemoteAddr)
 
 }
+
+// AddServer uses NewApp behind the scenes to add another application
+// server to the Profiles array.
+func (p *Profile) AddServer(host string, port string, Endpoint string, client *http.Client) {
+	newApp := NewApp(host, port, Endpoint, client)
+	p.AppServers = append(p.AppServers, newApp)
+}
