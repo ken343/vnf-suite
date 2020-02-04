@@ -92,7 +92,7 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Printf("Response Body is : %s\n", buffer)
 
 	fmt.Printf("The origin host:port is == %s\n", req.RemoteAddr)
-	fmt.Println("==========================================================================================================\n")
+	fmt.Println("==========================================================================================================")
 }
 
 // AddServer uses NewApp behind the scenes to add another application
