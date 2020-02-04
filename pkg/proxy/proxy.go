@@ -20,19 +20,17 @@ type Profile struct {
 // that will dynamically add several application server routes
 // based on a profile. My swap this with proxy type in /pkg/proxy/
 type App struct {
-	AppHost     string
-	AppPort     string
-	Endpoint    string
-	RouteClient *http.Client
+	AppHost  string
+	AppPort  string
+	Endpoint string
 }
 
 // NewApp constructs a new App type.
-func NewApp(host string, port string, Endpoint string, client *http.Client) App {
+func NewApp(host string, port string, Endpoint string) App {
 	newApp := App{
-		AppHost:     host,
-		AppPort:     port,
-		Endpoint:    Endpoint,
-		RouteClient: client,
+		AppHost:  host,
+		AppPort:  port,
+		Endpoint: Endpoint,
 	}
 
 	return newApp
@@ -59,7 +57,7 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 
 	// Send request to target application server.
-	resp, err := r.RouteClient.Do(mcReq) //GET
+	resp, err := http.DefaultClient.Do(mcReq) //GET
 	if err != nil {
 		log.Fatalf("Endpoint /%s new response not generated from application server: %v\n", r.Endpoint, err)
 	}
@@ -94,12 +92,12 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Printf("Response Body is : %s\n", buffer)
 
 	fmt.Printf("The origin host:port is == %s\n", req.RemoteAddr)
-
+	fmt.Println("==========================================================================================================\n")
 }
 
 // AddServer uses NewApp behind the scenes to add another application
 // server to the Profiles array.
-func (p *Profile) AddServer(host string, port string, Endpoint string, client *http.Client) {
-	newApp := NewApp(host, port, Endpoint, client)
+func (p *Profile) AddServer(host string, port string, endpoint string) {
+	newApp := NewApp(host, port, endpoint)
 	p.AppServers = append(p.AppServers, newApp)
 }

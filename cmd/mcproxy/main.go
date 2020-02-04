@@ -18,19 +18,17 @@ const (
 
 // Variable need to create a client where the reverse proxy can forward requests.
 // This variable is declared globally because documentation says that http.Client
-// is safe for concurrent use and uses caching. Thus all routes will use a single
-// mcClient.
+// is safe for concurrent use and uses caching.
 var (
-	mcClient    = &http.Client{}
 	myProxyMux  = http.NewServeMux()
 	testProfile = &proxy.Profile{
 		Name: "ken",
 		Port: "7777",
 		AppServers: []proxy.App{
-			proxy.NewApp("localhost", "8081", "/", mcClient),
-			proxy.NewApp("localhost", "8081", "/english", mcClient),
-			proxy.NewApp("localhost", "8082", "/spanish", mcClient),
-			proxy.NewApp("localhost", "8083", "/russian", mcClient),
+			proxy.NewApp("localhost", "8081", "/"),
+			proxy.NewApp("localhost", "8081", "/english"),
+			proxy.NewApp("localhost", "8082", "/spanish"),
+			proxy.NewApp("localhost", "8083", "/russian"),
 		},
 	}
 )
@@ -40,11 +38,8 @@ func main() {
 	log.SetFlags(log.Llongfile)
 
 	// Test store and load functions.
-	fmt.Printf("testProfile Check --> %v\n", testProfile)
 	storeProfile(testProfile)
-
-	mcProfile := loadProfile("ken")
-	fmt.Printf("mcProfile Check --> %v\n", mcProfile)
+	mcProfile := loadProfile("./config/ken.json")
 
 	fmt.Printf("Howdy, mcProxy is listening on port %s...\n", ":"+mcProfile.Port)
 	// Remember that proxy.Profile.Appservers[i] implement the "Handler" interface.
@@ -67,7 +62,7 @@ func main() {
 }
 
 func loadProfile(profileName string) *proxy.Profile {
-	file := profileName + ".json"
+	file := profileName
 	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0777)
 	if err != nil {
 		log.Fatalf("Error Opening File: %v\n", err)

@@ -13,7 +13,7 @@ mcProxy
 Usage:
 
 ```bash
-mcproxy <SUBCOMMAND> [ARGUEMENTS]
+$ mcproxy <SUBCOMMAND> [ARGUEMENTS]
 ```
 
 Sub-Cmd | Explanation
@@ -24,7 +24,7 @@ instance | list out all available reverse proxy profiles
 
 ### add
 ```bash
-mproxy add _proxy-name_ _proxy-port_
+$ mproxy add _proxy-name_ _proxy-port_
 ```
 #### Requirements
 
