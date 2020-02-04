@@ -43,10 +43,12 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	targetQuery := "?" + req.URL.RawQuery
 	targetURL := "http://" + r.AppHost + ":" + r.AppPort + r.Endpoint + targetQuery
 
+	fmt.Println("====================================================================")
 	fmt.Printf("Routing to IP == %s\n", r.AppHost)
 	fmt.Printf("Routing to Port == %s\n", r.AppPort)
 	fmt.Printf("Endpoint mcProxy received == %s\n", r.Endpoint)
-	fmt.Printf("Sanity Check targetURL == %s\n\n", "http://"+r.AppHost+":"+r.AppPort+targetQuery)
+	fmt.Printf("Sanity Check targetURL == %s\n", "http://"+r.AppHost+":"+r.AppPort+targetQuery)
+	fmt.Println("--------------------------------------------------------------------")
 
 	// Generate a new request that will be sent to the target application
 	// server.
@@ -92,7 +94,7 @@ func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Printf("Response Body is : %s\n", buffer)
 
 	fmt.Printf("The origin host:port is == %s\n", req.RemoteAddr)
-	fmt.Println("==========================================================================================================")
+	fmt.Println("====================================================================")
 }
 
 // AddServer uses NewApp behind the scenes to add another application
