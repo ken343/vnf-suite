@@ -1,11 +1,10 @@
 package main
 
 import (
-	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/ken343/vnf-suite/pkg/proxy"
@@ -23,7 +22,7 @@ var (
 	myProxyMux  = http.NewServeMux()
 	testProfile = &proxy.Profile{
 		Name: "ken",
-		Port: "7777",
+		Port: "8080",
 		AppServers: []proxy.App{
 			proxy.NewApp("localhost", "8081", "/"),
 			proxy.NewApp("localhost", "8081", "/english"),
@@ -37,11 +36,20 @@ func main() {
 	// Set up error log to ouptut information
 	log.SetFlags(log.Lshortfile)
 
-	CreateProfile()
+	flag.Parse()
+	fmt.Printf("flag.Arg(0) == %v\n", flag.Arg(0))
+	switch flag.Arg(0) {
+	case "create":
+		proxy.CreateProfile()
+	case "mount":
+		proxy.AddApplication(flag.Arg(1))
+	default:
+		fmt.Println("No valid sub command selected.")
+	}
 
 	// Test store and load functions.
-	storeProfile(testProfile)
-	mcProfile := loadProfile("./config/ken.json")
+	proxy.StoreProfile(testProfile)
+	mcProfile := proxy.LoadProfile("./config/ken.json")
 
 	fmt.Printf("Howdy, mcProxy is listening on port %s...\n", ":"+mcProfile.Port)
 	// Remember that proxy.Profile.Appservers[i] implement the "Handler" interface.
@@ -61,34 +69,4 @@ func main() {
 
 	myProxyServer.ListenAndServe()
 
-}
-
-func loadProfile(profileName string) *proxy.Profile {
-	file := profileName
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0777)
-	if err != nil {
-		log.Fatalf("Error Opening File: %v\n", err)
-	}
-	defer f.Close()
-
-	newProfile := &proxy.Profile{}
-	jsonerr := json.NewDecoder(f).Decode(newProfile)
-	if jsonerr != nil {
-		log.Fatalf("Error Decoding File: %v\n", err)
-	}
-	return newProfile
-}
-
-func storeProfile(profile *proxy.Profile) {
-	file := "./config/" + profile.Name + ".json"
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0777)
-	if err != nil {
-		log.Fatalf("Error opening file to be written: %v\n", err)
-	}
-	defer f.Close()
-
-	jsonerr := json.NewEncoder(f).Encode(profile)
-	if jsonerr != nil {
-		log.Fatalf("Error encoding file %v.\n", jsonerr)
-	}
 }

@@ -1,9 +1,7 @@
-package main
+package proxy
 
 import (
 	"fmt"
-
-	"github.com/ken343/vnf-suite/pkg/proxy"
 )
 
 // CreateProfile will have the user define a reverse proxy
@@ -18,13 +16,13 @@ func CreateProfile() {
 	fmt.Printf("Please enter a port number for %s to listen on:\n", name)
 	fmt.Scanln(&port)
 
-	emptyApps := make([]proxy.App, 0)
+	emptyApps := make([]App, 0)
 
-	newProfile := proxy.Profile{
+	newProfile := Profile{
 		Name:       name,
 		Port:       port,
 		AppServers: emptyApps,
 	}
 
-	storeProfile(&newProfile)
+	StoreProfile(&newProfile)
 }

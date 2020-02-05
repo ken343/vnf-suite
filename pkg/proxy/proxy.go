@@ -26,11 +26,11 @@ type App struct {
 }
 
 // NewApp constructs a new App type.
-func NewApp(host string, port string, Endpoint string) App {
+func NewApp(host string, port string, endpoint string) App {
 	newApp := App{
 		AppHost:  host,
 		AppPort:  port,
-		Endpoint: Endpoint,
+		Endpoint: endpoint,
 	}
 
 	return newApp
