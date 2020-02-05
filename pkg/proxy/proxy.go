@@ -41,6 +41,12 @@ func NewApp(host string, port string, endpoint string) App {
 
 }
 
+// String implements the "Stringer" interface.
+func (r App) String() string {
+	return fmt.Sprintf("%s --> %s:%s", r.Endpoint, r.AppHost, r.AppPort)
+}
+
+// ServeHTTP implements the Handler interface.
 func (r App) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	// Create URL that targets the appropriate application server.

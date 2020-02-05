@@ -6,12 +6,9 @@ import (
 
 // CreateProfile will have the user define a reverse proxy
 // profile that will be stored in the config directory.
-func CreateProfile() {
-	var name string
+func CreateProfile(proxy string) {
+	var name string = proxy
 	var port string
-
-	fmt.Println("Please enter a name for new Reverse Proxy Profile:")
-	fmt.Scanln(&name)
 
 	fmt.Printf("Please enter a port number for %s to listen on:\n", name)
 	fmt.Scanln(&port)
@@ -25,4 +22,5 @@ func CreateProfile() {
 	}
 
 	StoreProfile(&newProfile)
+	fmt.Printf("Reverse Proxy profile *%s* has been saved!\n", name)
 }
