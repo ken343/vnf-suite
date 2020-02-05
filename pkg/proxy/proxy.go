@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+// Default multiplexor used by the proxy package.
+
+var myProxyMux = http.NewServeMux()
+
 // Profile will hold the port of the current reverse proxy server
 // as well as load in new array of application servers.
 type Profile struct {

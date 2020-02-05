@@ -2,14 +2,16 @@ package proxy
 
 import "fmt"
 
-// AddApplication takes the selected proxy file and "mounts"
+// Mount takes the selected proxy file and "mounts"
 // the business server to its routing.
-func AddApplication(proxy string) {
+func Mount(proxy string) {
 	var host string
 	var port string
 	var endpoint string
 	var answer string = "n"
 
+	// Continuously ask using to add new servers. "selectedProxy" is saved
+	// to the profile once the user says no.
 	selectedProxy := LoadProfile("./config/" + proxy + ".json")
 	for {
 		fmt.Println("Please enter the domain name of the application server you would like to add to profile:")
@@ -22,6 +24,7 @@ func AddApplication(proxy string) {
 		newApp := NewApp(host, port, endpoint)
 		selectedProxy.AppServers = append(selectedProxy.AppServers, newApp)
 		fmt.Println("New application mount successful.")
+		fmt.Print("\n")
 		fmt.Println("Would you like to add another? [y/n]")
 		fmt.Scanln(&answer)
 		if answer == "n" {
