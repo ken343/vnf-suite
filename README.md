@@ -17,10 +17,12 @@ $ mcproxy <SUBCOMMAND> [ARGUEMENTS]
 ```
 
 Sub-Cmd | Explanation
---------|------------
-add | adds a reverse proxy profile
-remove | removes a reverse proxy profile
-instance | list out all available reverse proxy profiles
+--------|-----------
+build | creates a reverse proxy profile that can be mounted to
+mount | adds a business server that proxy should route to
+unmount | removes a busienss server that proxy has mounted
+run | runs instance of selected profile
+
 
 ### add
 ```bash
