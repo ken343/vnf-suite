@@ -15,7 +15,6 @@ func main() {
 	// Parse Command Line arguements and use them to find
 	// appropriate sub-command for mcProxy to run.
 	flag.Parse()
-	fmt.Printf("flag.Arg(0) == %v\n", flag.Arg(0))
 	switch flag.Arg(0) {
 	case "build":
 		proxy.CreateProfile(flag.Arg(1))

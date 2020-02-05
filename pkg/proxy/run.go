@@ -25,6 +25,6 @@ func Run(proxy string) {
 		WriteTimeout: 15 * time.Second,
 	}
 
-	myProxyServer.ListenAndServe()
+	myProxyServer.ListenAndServeTLS("cert.pem", "key.pem")
 
 }

@@ -1,3 +1,4 @@
 mcproxy
+*.pem
 /config/*
 !*/
