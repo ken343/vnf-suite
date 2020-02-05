@@ -22,6 +22,8 @@ build | creates a reverse proxy profile that can be mounted to
 mount | adds a business server that proxy should route to
 unmount | removes a busienss server that proxy has mounted
 run | runs instance of selected profile
+profiles | list out mcProxy profiles
+remove | removes a profile from memory
 
 
 ### add
