@@ -1,4 +1,4 @@
 #! /bin/bash
 
 echo building...
-go build ./cmd/mcproxy/
+go install ./cmd/mcproxy/
