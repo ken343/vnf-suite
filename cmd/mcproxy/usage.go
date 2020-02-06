@@ -9,8 +9,8 @@ Usage:
 
 The commands are:
 
-		build		compile packages and dependencies
-		run 		compile and run Go program
+		build		create a new mcProxy profile with a given name
+		run 		start running mcProxy server with selected profile.
 		profiles	list out reverse proxy profiles
 		remove		remove selected profile from system
 		mount		add a routing to an application server

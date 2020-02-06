@@ -31,6 +31,6 @@ func main() {
 	case "help":
 		fmt.Println(usage)
 	default:
-		fmt.Println("No valid sub command selected.")
+		fmt.Println("No valid sub command selected. Use \"mcproxy help\" for information on various options.")
 	}
 }
