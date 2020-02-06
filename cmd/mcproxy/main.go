@@ -24,6 +24,8 @@ func main() {
 		proxy.Run(flag.Arg(1))
 	case "unmount":
 		proxy.UnMount(flag.Arg(1))
+	case "profiles":
+		proxy.ViewProfiles()
 	default:
 		fmt.Println("No valid sub command selected.")
 	}

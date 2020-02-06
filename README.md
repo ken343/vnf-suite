@@ -5,7 +5,7 @@ McSecurity is a suite of programs designed to emulate network functions virtuall
 These inclue:
 
 1. mcProxy - A CLI tool that can create a reverse proxy that will route requests to a list of application servers.
-2. mcFilter - A virtual firewall.
+2. mcLogger - Keeps a tab on the actions for the system.
 
 mcProxy
 -------
@@ -20,7 +20,7 @@ Sub-Cmd | Explanation
 --------|-----------
 build | creates a reverse proxy profile that can be mounted to
 mount | adds a business server that proxy should route to
-unmount | removes a busienss server that proxy has mounted
+unmount | removes a business server that proxy has mounted
 run | runs instance of selected profile
 profiles | list out mcProxy profiles
 remove | removes a profile from memory
@@ -37,13 +37,13 @@ Develop your own networking programs to watch, modify, and route network traffic
 * Solution:
     1. Functional
     2. Quality
-        - [ ] Documentation
+        - [X] Documentation
         - [X] Agile Project Management
         - [ ] Unit Testing
         - [ ] Logs & Metrics
         - [ ] Environment Configuration
-        - [ ] Secuirty
-        - [ ] Build & Deploy Scripts
+        - [X] Secuirty
+        - [X] Build & Deploy Scripts
         - [ ] Containerization
     3. Performance
 * Stakeholder & Legal:
