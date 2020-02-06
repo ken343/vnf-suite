@@ -28,6 +28,8 @@ func main() {
 		proxy.ViewProfiles()
 	case "remove":
 		proxy.Remove(flag.Arg(1))
+	case "help":
+		fmt.Println(usage)
 	default:
 		fmt.Println("No valid sub command selected.")
 	}
