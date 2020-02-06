@@ -1,2 +1,2 @@
-build:
+install:
 	./scripts/compile.sh
